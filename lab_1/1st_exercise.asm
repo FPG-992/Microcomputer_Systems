@@ -9,10 +9,16 @@
 .def BACKUP_B = r22
 .def BACKUP_C = r23
 .def BACKUP_D = r24
-.def BNOT = r26
 .def F1 = r25
+.def BNOT = r26
+.def OUTPUT = r27
 
-START: clr temp ;PORT B AS INPUT
+START: clr TEMP
+
+LDS TEMP, DDRC       
+ORI TEMP, 0x03       
+STS DDRC, TEMP       
+
 
 IN TEMP,PORTB
 
@@ -57,3 +63,10 @@ COM TEMP ; TEMP = NOT B
 OR TEMP, BACKUP_D ; TEMP = NOT B OR D
 
 AND F1, TEMP ; F1 = F1 AND TEMP = (NOT A OR NOT C) AND (NOT B OR D)
+
+IN OUTPUT, PORTC
+ANDI OUTPUT, 0xFC ; mask the last 2 bits
+OR OUTPUT,A ; OR the result of F0
+LSL F1 ; shift F1 to the left
+OR OUTPUT,F1 ; OR the result of F1
+OUT PORTC, OUTPUT
