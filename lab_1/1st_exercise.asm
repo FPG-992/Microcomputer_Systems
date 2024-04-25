@@ -1,74 +1,69 @@
 .include "m328PBdef.inc"
-    
+
 .def A=r16
 .def B=r17
 .def C=r18
 .def D=r19
 .def TEMP=r20
-.def BACKUP_A = r21
-.def BACKUP_B = r22
-.def BACKUP_C = r23
-.def BACKUP_D = r24
-.def F1 = r25
-.def BNOT = r26
-.def OUTPUT = r27
+.def ANOT=r21
+.def BNOT=r22
+.def CNOT=r23
+.def BACKUP_A=r24
+.def BACKUP_B=r25
+.def BACKUP_C=r26
+.def BACKUP_D=r27
+.def F0=r28
+.def F1=r29
 
-START: clr TEMP
-
-LDS TEMP, DDRC       
-ORI TEMP, 0x03       
-STS DDRC, TEMP       
-
-
-IN TEMP,PORTB
-
-MOV A,TEMP
-ANDI A,0x01
-MOV BACKUP_A,A
-
-MOV B,TEMP
-LSR B ; bit 1 goes to bit 0
-ANDI B,0x01 ; mask bit 0
-MOV BACKUP_B,B
-
-MOV C,TEMP 
-LSR C ; bit 2 goes to bit 1
-LSR C ; bit 2 goes to bit 0
-ANDI C,0x01 ; mask bit 0
-MOV BACKUP_C,C
-
-MOV D,TEMP
-LSR D ; bit 3 goes to bit 2
-LSR D ; bit 3 goes to bit 1
-LSR D ; bit 3 goes to bit 0
-ANDI D,0x01 ; mask bit 0
-MOV BACKUP_D,D
-
-;THIS IS THE CALCULATION OF F0
-MOV BNOT,B
-COM BNOT
-and A,BNOT ; A AND B' : A = A AND B'
-and B,D ; B AND D : B = B AND D
-or A,B ; A OR B : A = A OR B
-
-;THIS IS THE CALCULATION OF F1 F1= (A?+C?) ? (B?+D)
-MOV F1, BACKUP_A
-COM F1 ; F1 = NOT A
-MOV TEMP, BACKUP_C
-COM TEMP ; TEMP = NOT C
-OR F1 , TEMP ; F1 = F1 OR TEMP = NOT A OR NOT C
-
-MOV TEMP, BACKUP_B
-COM TEMP ; TEMP = NOT B
-OR TEMP, BACKUP_D ; TEMP = NOT B OR D
-
-AND F1, TEMP ; F1 = F1 AND TEMP = (NOT A OR NOT C) AND (NOT B OR D)
-
-IN OUTPUT, PORTC
-ANDI OUTPUT, 0xFC ; mask the last 2 bits
-OR OUTPUT,A ; OR the result of F0
-LSL F1 ; shift F1 to the left
-OR OUTPUT,F1 ; OR the result of F1
-OUT PORTC, OUTPUT
+;F0 = (A ? B' + B ? D) || F1= (A?+C?) ? (B?+D)
     
-JMP START
+START: clr TEMP
+OUT DDRB,TEMP
+SER TEMP
+OUT PORTB,TEMP
+OUT DDRC,TEMP
+    
+AGAIN: in TEMP,PINB ;read PINS FROM PORT B 
+MOV A,TEMP ;A IN A'S LSB
+LSR TEMP
+MOV B,TEMP ;B IN B'S LSB
+LSR TEMP
+MOV C,TEMP ;C IN C'S LSB
+LSR TEMP
+MOV D,TEMP ;D IN C'S LSB
+    
+MOV ANOT,A ;AN=A
+COM ANOT ;A=A;
+MOV BNOT,B ;BN = B
+COM BNOT ;BN=B'
+MOV CNOT,C ; CN=C
+COM CNOT ; CN=C'
+    
+MOV A,BACKUP_A
+MOV B,BACKUP_B
+MOV C,BACKUP_C
+MOV D,BACKUP_D
+    
+AND A,BNOT ; A = (A*B')
+AND B,D ; B = (B*D)
+OR A,B ; A = (A ? B' + B ? D)
+
+MOV F0,A ; SET F0
+
+; TIME TO CALCULATE F1
+
+OR ANOT,CNOT ;ANOT = (A'+C')
+OR BNOT,D ;BNOT = (B'+D)
+AND ANOT,BNOT ;(A'+C')*(B'+D)
+
+ANDI ANOT,1 ;ISOLATE LSB
+
+MOV F1,ANOT ; SET F1
+    
+;OUTPUT
+MOV A,F0 
+ANDI A,1 
+LSL A
+or A,F1
+OUT PORTC,A    
+    
