@@ -65,5 +65,5 @@ MOV A,F0
 ANDI A,1 
 LSL A
 or A,F1
-OUT PORTC,A    
     
+OUT PORTC,A    
