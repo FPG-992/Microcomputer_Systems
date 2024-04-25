@@ -1,5 +1,5 @@
-.include "m328PB.def.inc"
-
+.include "m328PBdef.inc"
+    
 .def A=r16
 .def B=r17
 .def C=r18
@@ -9,7 +9,7 @@
 .def BACKUP_B = r22
 .def BACKUP_C = r23
 .def BACKUP_D = r24
-.def BNOT = r25
+.def BNOT = r26
 .def F1 = r25
 
 START: clr temp ;PORT B AS INPUT
@@ -39,9 +39,9 @@ ANDI D,0x01 ; mask bit 0
 MOV BACKUP_D,D
 
 ;THIS IS THE CALCULATION OF F0
-MOV BN,B
-COM BN
-and A,BN ; A AND B' : A = A AND B'
+MOV BNOT,B
+COM BNOT
+and A,BNOT ; A AND B' : A = A AND B'
 and B,D ; B AND D : B = B AND D
 or A,B ; A OR B : A = A OR B
 
@@ -57,5 +57,3 @@ COM TEMP ; TEMP = NOT B
 OR TEMP, BACKUP_D ; TEMP = NOT B OR D
 
 AND F1, TEMP ; F1 = F1 AND TEMP = (NOT A OR NOT C) AND (NOT B OR D)
-    
-END
