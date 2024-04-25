@@ -51,7 +51,7 @@ and A,BNOT ; A AND B' : A = A AND B'
 and B,D ; B AND D : B = B AND D
 or A,B ; A OR B : A = A OR B
 
-;THIS IS THE CALCULATION OF F1 F1= (A’+C’) ∙ (B’+D)
+;THIS IS THE CALCULATION OF F1 F1= (A?+C?) ? (B?+D)
 MOV F1, BACKUP_A
 COM F1 ; F1 = NOT A
 MOV TEMP, BACKUP_C
@@ -70,3 +70,5 @@ OR OUTPUT,A ; OR the result of F0
 LSL F1 ; shift F1 to the left
 OR OUTPUT,F1 ; OR the result of F1
 OUT PORTC, OUTPUT
+    
+JMP START
