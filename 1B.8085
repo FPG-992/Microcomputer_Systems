@@ -1,0 +1,38 @@
+START:
+
+IN 10H ;disable memory protection
+MVI A,00H ; A = 0 
+LXI H,0900H ; H hold the address 0900H
+
+INCREMENT:
+
+MOV M,A ; A stored in memory address of HL 
+INX H ; increment HL pair
+INR A ; A = A+1
+CPI 80H ; is A<128
+JNZ INCREMENT ; if yes repeat
+
+
+COUNTER_PROCEDURE:
+LXI B,0000H ; B = 0
+LXI H,0900H ; H hold the address 0900H Again
+MVI D,00H ; D = 0 this will be used for counting the numbers
+
+INIT_LOOP:
+MOV A,M ; A = M
+MVI E,08H ; E = 8
+
+CHECK_BIT:
+RAR ; rotate right
+JNC IS_ZERO ; if carry = 0
+INX B ; BC = BC+1
+
+IS_ZERO:
+DCR E ; E = E-1
+JNZ CHECK_BIT ; if C != 0 repeat
+INX H ; increment HL pair
+INR D ; D = D+1
+CPI 80H ; is D<128
+JNZ INIT_LOOP ; if yes repeat
+
+END
