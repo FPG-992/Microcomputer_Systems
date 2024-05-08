@@ -16,6 +16,7 @@ JNZ INCREMENT ; if yes repeat
 COUNTER_PROCEDURE:
 MVI B, 00H ; B = 0 this will be used for counting 1's
 LXI H, 0900H ; H hold the address 0900H Again
+MVI D,00H ; D = 0 this will be used for counting the numbers
 
 INIT_LOOP:
 MOV A,M ; A = M
@@ -30,7 +31,8 @@ IS_ZERO:
 DCR C ; C = C-1
 JNZ CHECK_BIT ; if C != 0 repeat
 INX H ; increment HL pair
-CPI 80H ; is A<128
+INR D ; D = D+1
+CPI 80H ; is D<128
 JNZ INIT_LOOP ; if yes repeat
 
 END
