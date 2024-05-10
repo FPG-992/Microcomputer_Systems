@@ -1,6 +1,6 @@
 START:
 LDA 2000H ; Load dip switches' value
-MOV A,B ;Copy the value to B
+MOV B,A ;Copy the value to B
 
 A0_AND_B0:
 ANI 01H ; Mask the least significant bit A = A AND 00000001
