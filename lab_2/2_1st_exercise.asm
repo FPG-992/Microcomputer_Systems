@@ -27,7 +27,7 @@ out DDRD, r24 ; Init PORTD as input
 ldi r24, (1<<ISC11) | (1<<ISC10)
 sts EICRA, r24
 
-;enable INT1 interrupt
+;enable INT1 interrupt (EXETERNAL!!!)
 ldi r24, (1<<INT1)
 out EIMSK, r24
 
@@ -36,3 +36,39 @@ sei
 clr r24
 out PORTC, r24
 
+main:
+
+mov r24, counter
+andi r24, 0x0F
+com r24
+out PORTC, r24
+
+rjmp main
+
+;external interrupt 1 service routine
+isr1:
+
+sbic PIND, 7 ; Skip if MSB of PIND is 0
+inc counter ; Increment counter if MSB of PIND is 1
+
+cpi counter, 16; Compare counter with 16
+breq reset_counter ; Reset counter if counter is 16
+
+
+reset_counter:
+clr counter ; Reset counter
+inc counter ; Increment counter
+
+;Delay 100 mS
+ ldi r24, low(16*100) ; Init r25, r24 for delay 500 mS
+ ldi r25, high(16*100) ; CPU frequency = 16 MHz
+delay1:
+ ldi r23, 249 ; (1 cycle)
+delay2:
+ dec r23 ; 1 cycle
+ nop ; 1 cycle
+ brne delay2 ; 1 or 2 cycles
+ sbiw r24, 1 ; 2 cycles
+ brne delay1 ; 1 or 2 cycles
+
+ reti
