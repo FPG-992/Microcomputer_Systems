@@ -5,7 +5,7 @@
 .org 0x0 ; Start the code at address 0x0
 rjmp reset
 
-.org 0x4 ; Interrupt vector for the reset
+.org 0x4 ; Interrupt vector for INT1
 rjmp isr1
 
 ;program starts here after reset
@@ -69,5 +69,5 @@ delay2:
 
  ldi r24,(1<<INTF1)
  out EIFR, r24 ; Clear INTF1 flag
- 
+
  reti
