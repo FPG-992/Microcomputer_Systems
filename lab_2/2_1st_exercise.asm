@@ -40,7 +40,6 @@ main:
 
 mov r24, counter
 andi r24, 0x0F
-com r24
 out PORTC, r24
 
 rjmp main
@@ -52,15 +51,12 @@ sbic PIND, 7 ; Skip if MSB of PIND is 0
 inc counter ; Increment counter if MSB of PIND is 1
 
 cpi counter, 16; Compare counter with 16
-breq reset_counter ; Reset counter if counter is 16
+brne skip_reset ;skip if counter is not 16
+ldi counter, 1
 
-
-reset_counter:
-clr counter ; Reset counter
-inc counter ; Increment counter
-
+skip_reset:
 ;Delay 100 mS
- ldi r24, low(16*100) ; Init r25, r24 for delay 500 mS
+ ldi r24, low(16*100) ; Init r25, r24 for delay 100 mS
  ldi r25, high(16*100) ; CPU frequency = 16 MHz
 delay1:
  ldi r23, 249 ; (1 cycle)
@@ -71,4 +67,7 @@ delay2:
  sbiw r24, 1 ; 2 cycles
  brne delay1 ; 1 or 2 cycles
 
+ ldi r24,(1<<INTF1)
+ out EIFR, r24 ; Clear INTF1 flag
+ 
  reti
