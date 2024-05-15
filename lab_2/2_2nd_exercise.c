@@ -8,13 +8,13 @@ volatile int counter = 3000;
 ISR(INT1_vect) // External INT1 ISR
 {
     PORTB = 0xFF; // Turn on all LEDs of PORTB
-    _delay_ms(1000); // for 1000ms
+    _delay_ms(1000); // Delay for 1000 ms
     PORTB = 0x01; // Turn off all LEDs of PORTB except PB0
     counter = 3000; // Reset the counter
     EIFR = (1 << INTF1); // Clear the interrupt flag of INTF1
 }
 
-int main()
+int main(void)
 {
     // Interrupt on rising edge of INT1 pin
     EICRA = (1 << ISC11) | (1 << ISC10);
@@ -25,16 +25,19 @@ int main()
     sei(); // Enable global interrupts
 
     DDRB = 0xFF; // Set PORTB as output
+    PORTB = 0x00; // Initialize PORTB to 0
 
     while(1)
     {
         _delay_ms(1); // Delay 1 ms
-        counter--; // Decrement the counter
-
-        if(counter == 0)
+        if(counter > 0)
         {
-            PORTB = 0x00; // Turn off the LED on PB0
-            counter = 3000; // Reset the counter
+            counter--; // Decrement the counter
+
+            if(counter == 0)
+            {
+                PORTB = 0x00; // Turn off the LED on PB0
+            }
         }
     }
 }
