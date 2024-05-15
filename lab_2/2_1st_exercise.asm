@@ -47,6 +47,13 @@ rjmp main
 ;external interrupt 1 service routine
 isr1:
 
+push r23
+push r24
+push r25
+
+in r25, SREG
+push r25 ; save r23, r24, 25, SREG to stack
+
 sbic PIND, 7 ; Skip if MSB of PIND is 0
 inc counter ; Increment counter if MSB of PIND is 1
 
@@ -69,5 +76,11 @@ delay2:
 
  ldi r24,(1<<INTF1)
  out EIFR, r24 ; Clear INTF1 flag
+
+pop r25
+out SREG, r25
+pop r25
+pop r24
+pop r23 ; Retrieve r23, r24, 25, SREG from stack
 
  reti
