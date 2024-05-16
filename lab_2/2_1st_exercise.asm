@@ -54,7 +54,7 @@ push r25 ; save r23, r24, 25, SREG to stack
 
 ;program starts here;
 in r16,PIND
-andi r16,0x80
+andi r16,0x80 ;if bit is set dont count
 breq skip_next
     
 ;increase count and show   
@@ -63,6 +63,12 @@ skip_next:
 andi counter,0x0f
 out PORTC,counter 
 
+;if counter becomes 15, we reset
+cpi counter,15
+brne skip_reset
+ldi counter,0
+out portc,counter
+    
 skip_reset:
 ;Delay 100 mS
  ldi r24, low(16*100) ; Init r25, r24 for delay 100 mS
