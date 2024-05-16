@@ -35,12 +35,10 @@ sei
 
 clr r24
 out PORTC, r24
+    
+ldi counter,0 ;set initial counter to 0
 
 main:
-
-mov r24, counter
-andi r24, 0x0F
-out PORTC, r24
 
 rjmp main
 
@@ -54,12 +52,12 @@ push r25
 in r25, SREG
 push r25 ; save r23, r24, 25, SREG to stack
 
-sbic PIND, 7 ; Skip if MSB of PIND is 0
-inc counter ; Increment counter if MSB of PIND is 1
+;program starts here;
+    
+inc counter
+andi counter,0x0f
+out PORTC,counter 
 
-cpi counter, 16; Compare counter with 16
-brne skip_reset ;skip if counter is not 16
-ldi counter, 1
 
 skip_reset:
 ;Delay 100 mS
