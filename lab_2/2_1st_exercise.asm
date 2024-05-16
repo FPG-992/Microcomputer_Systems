@@ -35,13 +35,17 @@ sei
 
 clr r24
 out PORTC, r24
+    
+;ldi counter,0 ;set initial counter to 0
 
-main:
+main: ;kuria routina
 
-mov r24, counter
-andi r24, 0x0F
-out PORTC, r24
+andi counter,0x0f
+out PORTC,counter 
+    
 
+    
+    
 rjmp main
 
 ;external interrupt 1 service routine
@@ -54,12 +58,20 @@ push r25
 in r25, SREG
 push r25 ; save r23, r24, 25, SREG to stack
 
-sbic PIND, 7 ; Skip if MSB of PIND is 0
-inc counter ; Increment counter if MSB of PIND is 1
+;program starts here;
+in r16,PIND
+andi r16,0x80 ;if bit is set dont count
+breq skip_next
+    
+;increase count and show   
+inc counter
+skip_next:
 
-cpi counter, 16; Compare counter with 16
-brne skip_reset ;skip if counter is not 16
-ldi counter, 1
+
+;if counter becomes 15, we reset
+cpi counter,15
+brne skip_reset
+ldi counter,0
 
 skip_reset:
 ;Delay 100 mS
