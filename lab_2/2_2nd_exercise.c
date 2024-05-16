@@ -4,13 +4,15 @@
 #include<util/delay.h>
 
 volatile uint16_t counter = 300;
-volatile uint8_t pb_on = 0;
-
+volatile uint8_t done_both = 1;
+volatile uint8_t done = 1;
 
 ISR(INT1_vect){ //external interrupt 1
-
     counter = 0;
-
+    if (done==0){
+        done_both=0;
+    }
+    done = 0;
 EIFR = (1 << INTF1); // Clear the flag of interrupt INTF1
 
 
@@ -28,20 +30,34 @@ int main(){
     PORTB=0x00; //initially all LEDs are off
 
     while(1){
-        if (counter<300){
+        if (counter<300 && done_both==0){
+            done_both = 0;
             if (counter<200)
             PORTB=0xFF; //turn on all LEDs
             _delay_ms(1);
             counter++;
             if (counter>200 && counter<299){
-                PORTB=0x01; //turn on the first LED             
+                PORTB=0x01; //turn on the first LED
+                _delay_ms(1);
             }
             if (counter==299) {
                 PORTB=0x00;
+                done_both = 1;
+                done = 1;
             }
             //
+        } else if (counter<300 && done == 0){
+            done = 0;
+            _delay_ms(1);
+            counter++;
+            if (counter<299 && done == 0){
+                PORTB=0x01;
+            } else if (counter==299 && done == 0){
+                PORTB=0x00;
+                done = 1;
+            }
+            
         }
-      
     }
 }
 
