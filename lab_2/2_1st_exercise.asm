@@ -53,11 +53,15 @@ in r25, SREG
 push r25 ; save r23, r24, 25, SREG to stack
 
 ;program starts here;
+in r16,PIND
+andi r16,0x80
+breq skip_next
     
+;increase count and show   
 inc counter
+skip_next:
 andi counter,0x0f
 out PORTC,counter 
-
 
 skip_reset:
 ;Delay 100 mS
