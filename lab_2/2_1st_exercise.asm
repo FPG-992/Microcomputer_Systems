@@ -36,10 +36,16 @@ sei
 clr r24
 out PORTC, r24
     
-ldi counter,0 ;set initial counter to 0
+;ldi counter,0 ;set initial counter to 0
 
-main:
+main: ;kuria routina
 
+andi counter,0x0f
+out PORTC,counter 
+    
+
+    
+    
 rjmp main
 
 ;external interrupt 1 service routine
@@ -60,15 +66,13 @@ breq skip_next
 ;increase count and show   
 inc counter
 skip_next:
-andi counter,0x0f
-out PORTC,counter 
+
 
 ;if counter becomes 15, we reset
 cpi counter,15
 brne skip_reset
 ldi counter,0
-out portc,counter
-    
+
 skip_reset:
 ;Delay 100 mS
  ldi r24, low(16*100) ; Init r25, r24 for delay 100 mS
