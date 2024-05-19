@@ -5,8 +5,10 @@ START:
 	MVI M,10H		
 	INX H			
 	MVI M,10H	
-	INX H				
+	INX H	
+    MVI M,10H			
 	INX H
+    MVI M,10H
 	INX H
 	MVI M,10H		
 	INX H			
@@ -68,7 +70,7 @@ L3:
 	JNC L3
 
 	ADI 0AH
-	LXI H,0A02H
+	LXI H,0A04H
 	MOV M,A
 	INX H
 	MOV M,B
