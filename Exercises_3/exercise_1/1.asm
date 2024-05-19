@@ -1,59 +1,92 @@
-START:
-IN 10H
+START:	
+	IN 10H			
+	LXI H,0A00H		
+				
+	MVI M,10H		
+	INX H			
+	MVI M,10H	
+	INX H				
+	INX H
+	INX H
+	MVI M,10H		
+	INX H			
+	MVI M,10H
 
-MVI A,10H  		 ;Set display
-STA 0B00H 
-STA 0B01H 
-STA 0B02H 
-STA 0B03H 
-STA 0B04H 
-STA 0B05H	
+	MVI A,0DH	
+	SIM				
+	EI
 
-MVI A,2DH			;Initialize interrupt mask
-SIM
-EI
-
-LXI B,00FAH
-
-Main_loop:
-jmp Main_loop
+WAIT:				
+	JMP WAIT
 
 INTR_ROUTINE:
-PUSH PSW
-PUSH H
-PUSH D
-PUSH B
+	MVI E,2DH
+	LXI B,00FAH
+	EI
 
-MVI C,5AH
-EI             ; Re-enable interrupts
+INIT:
+	MVI D,14H
+	CALL NEXT_SEC
+	
+	MVI A,00H
+    STA 3000H
+    CALL DELB
+    CMA
+    STA 3000H
+    CALL DELB
+    CMA 
+    STA 3000H
+    CALL DELB
+    CMA
+    STA 3000H
+    CALL DELB
+    MVI A,00H
 
-BLINK_LOOP:
-MVI A,00H ;1 time
-STA 3000H ; Turn off LEDs
-CALL DELB      ; Delay for 250 ms
+L1:
+	CALL DISP
+	DCR D
+	JNZ L1
+	
+	DCR E
+	JNZ INIT
+	
+	CMA
+	STA 3000H	
+	JMP WAIT
 
-MVI A,FFH ;2 times
-STA 3000H ; Turn on LEDs
-CALL DELB      ; Delay for 250 ms
+NEXT_SEC:
+	PUSH PSW
+	PUSH B
+	PUSH H
+	
+	MVI B,FFH
+	MOV A,E
 
-MVI A,00H ;3 times
-STA 3000H ; Turn off LEDs
-CALL DELB      ; Delay for 250 ms
+L3: 	
+	INR B
+	SUI 0AH
+	JNC L3
 
-MVI A,FFH ;4 times
-STA 3000H ; Turn on LEDs
-CALL DELB      ; Delay for 250 ms
+	ADI 0AH
+	LXI H,0A02H
+	MOV M,A
+	INX H
+	MOV M,B
 
-DCR C	         ; Decrement counter
-MOV A,C
-JNZ BLINK_LOOP ; If counter is not zero, repeat blinking
+	POP H
+	POP B
+	POP PSW
+	RET
 
-; End of blinking routine
-POP B
-POP D
-POP H
-POP PSW
+DISP:
+	PUSH PSW
+	PUSH D
+	LXI D,0A00H
 
-RET
+	CALL STDM
+	CALL DCD
+	POP D
+	POP PSW
+	RET
 
 END
