@@ -11,8 +11,8 @@ IN 10H
 	MVI A,0DH 		
 	SIM ; set interrupt mode
 	EI ; enable interrupt
-LOOP:
-	JMP LOOP
+MAIN:
+	JMP MAIN
 INTR_ROUTINE:
 	POP H			
 	EI				
@@ -40,7 +40,7 @@ LEDS_ON_ON:
 EXIT:
 	MVI A,FFH 		
 	STA 3000H 
-	JMP LOOP			
+	JMP MAIN			
 DISPLAY: 	
 	LXI B,0064H 		
 	LXI D,0B00H		
