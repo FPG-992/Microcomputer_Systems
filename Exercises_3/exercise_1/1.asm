@@ -9,7 +9,7 @@ STA 0B03H
 STA 0B04H 
 STA 0B05H	
 
-MVI A,0DH			;Initialize interrupt mask
+MVI A,2DH			;Initialize interrupt mask
 SIM
 EI
 
@@ -28,12 +28,19 @@ MVI C,5AH
 EI             ; Re-enable interrupts
 
 BLINK_LOOP:
-MVI A,00H
+MVI A,00H ;1 time
 STA 3000H ; Turn off LEDs
-
 CALL DELB      ; Delay for 250 ms
 
-MVI A,FFH
+MVI A,FFH ;2 times
+STA 3000H ; Turn on LEDs
+CALL DELB      ; Delay for 250 ms
+
+MVI A,00H ;3 times
+STA 3000H ; Turn off LEDs
+CALL DELB      ; Delay for 250 ms
+
+MVI A,FFH ;4 times
 STA 3000H ; Turn on LEDs
 CALL DELB      ; Delay for 250 ms
 
